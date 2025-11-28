@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Online - Productos y Servicios</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>🛒 Tienda Online</h1>
+        <nav>
+                <a href="#inicio">Inicio</a>
+                <a href="#productos">Productos</a>
+                <a href="#servicios">Servicios</a>
+                <a href="#categorias">Categorías</a>
+                <a href="#testimonios">Testimonios</a>
+                <a href="#contacto">Contacto</a>
+        </nav>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Carrito de Compras -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Carrito de Compras</h2>
+            <button class="close-cart" onclick="toggleCart()">✕</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Total: $<span id="cart-total">0.00</span></strong>
+            </div>
+            <button class="btn-checkout" onclick="checkout()">Finalizar Compra</button>
+        </div>
+    </div>
+
+    <section id=    "inicio" class="hero">
+        <div class="hero-content">
+        <h2>Bienvenido a nuestra tienda</h2>
+            <p>Compra los mejores productos y contrata servicios profesionales al mejor precio</p>
+            <div class="hero-buttons">
+                <button class="btn-hero" onclick="scrollToSection('productos')">Ver Productos</button>
+                <button class="btn-hero btn-hero-secondary" onclick="scrollToSection('servicios')">Ver Servicios</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categorías -->
+    <section id="categorias" class="categorias">
+        <h2>Categorías de Productos</h2>
+        <div class="categorias-grid">
+            <div class="categoria-card" onclick="filterCategory('tecnologia')">
+                <div class="categoria-icon">💻</div>
+                <h3>Tecnología</h3>
+                <p>Laptops, smartphones, tablets y más</p>
+            </div>
+            <div class="categoria-card" onclick="filterCategory('hogar')">
+                <div class="categoria-icon">🏠</div>
+                <h3>Hogar</h3>
+                <p>Electrodomésticos y decoración</p>
+            </div>
+            <div class="categoria-card" onclick="filterCategory('ropa')">
+                <div class="categoria-icon">👕</div>
+                <h3>Ropa y Moda</h3>
+                <p>Vestimenta para toda la familia</p>
+            </div>
+            <div class="categoria-card" onclick="filterCategory('deportes')">
+                <div class="categoria-icon">⚽</div>
+                <h3>Deportes</h3>
+                <p>Equipamiento deportivo</p>
+            </div>
+            <div class="categoria-card" onclick="filterCategory('belleza')">
+                <div class="categoria-icon">💄</div>
+                <h3>Belleza</h3>
+                <p>Cosméticos y cuidado personal</p>
+            </div>
+            <div class="categoria-card" onclick="filterCategory('libros')">
+                <div class="categoria-icon">📚</div>
+                <h3>Libros</h3>
+                <p>Literatura y educación</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productos -->
+    <section id="productos" class="productos">
+        <h2>Productos Disponibles</h2>
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterProducts('all')">Todos</button>
+            <button class="filter-btn" onclick="filterProducts('tecnologia')">Tecnología</button>
+            <button class="filter-btn" onclick="filterProducts('hogar')">Hogar</button>
+            <button class="filter-btn" onclick="filterProducts('ropa')">Ropa</button>
+            <button class="filter-btn" onclick="filterProducts('deportes')">Deportes</button>
+            <button class="filter-btn" onclick="filterProducts('belleza')">Belleza</button>
+            <button class="filter-btn" onclick="filterProducts('libros')">Libros</button>
+        </div>
+
+        <div class="grid" id="productos-grid">
+            <!-- Tecnología -->
+            <div class="card" data-category="tecnologia">
+                <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400" alt="Laptop Gamer">
+                <h3>Laptop Gamer</h3>
+                <p class="descripcion">Intel i7, 16GB RAM, RTX 3060</p>
+                <p class="precio">$18,999.99</p>
+                <button class="btn" onclick="addToCart('Laptop Gamer', 18999.99)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="tecnologia">
+                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400" alt="Smartphone Pro">
+                <h3>Smartphone Pro</h3>
+                <p class="descripcion">128GB, Cámara 108MP, 5G</p>
+                <p class="precio">$12,999.50</p>
+                <button class="btn" onclick="addToCart('Smartphone Pro', 12999.50)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="tecnologia">
+                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" alt="Audífonos Bluetooth">
+                <h3>Audífonos Bluetooth</h3>
+                <p class="descripcion">Cancelación de ruido, 30h batería</p>
+                <p class="precio">$899.90</p>
+                <button class="btn" onclick="addToCart('Audífonos Bluetooth', 899.90)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="tecnologia">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" alt="Smartwatch">
+                <h3>Smartwatch</h3>
+                <p class="descripcion">Monitor de salud, GPS, resistente al agua</p>
+                <p class="precio">$1,599.99</p>
+                <button class="btn" onclick="addToCart('Smartwatch', 1599.99)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="tecnologia">
+                <img src="https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400" alt="Tablet Pro">
+                <h3>Tablet Pro</h3>
+                <p class="descripcion">12.9 pulgadas, 256GB, Stylus incluido</p>
+                <p class="precio">$15,499.00</p>
+                <button class="btn" onclick="addToCart('Tablet Pro', 15499.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="tecnologia">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" alt="Cámara Digital">
+                <h3>Cámara Digital Profesional</h3>
+                <p class="descripcion">24MP, 4K Video, Lente 18-55mm</p>
+                <p class="precio">$22,999.00</p>
+                <button class="btn" onclick="addToCart('Cámara Digital Profesional', 22999.00)">Agregar al carrito</button>
+            </div>
+
+            <!-- Hogar -->
+            <div class="card" data-category="hogar">
+                <img src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400" alt="Aspiradora Robot">
+                <h3>Aspiradora Robot</h3>
+                <p class="descripcion">Limpieza automática, app control</p>
+                <p class="precio">$4,599.00</p>
+                <button class="btn" onclick="addToCart('Aspiradora Robot', 4599.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="hogar">
+                <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400" alt="Cafetera Express">
+                <h3>Cafetera Express</h3>
+                <p class="descripcion">15 bares presión, vaporizador</p>
+                <p class="precio">$3,299.00</p>
+                <button class="btn" onclick="addToCart('Cafetera Express', 3299.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="hogar">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400" alt="Lámpara LED">
+                <h3>Lámpara LED Inteligente</h3>
+                <p class="descripcion">RGB, control por app, Alexa</p>
+                <p class="precio">$599.00</p>
+                <button class="btn" onclick="addToCart('Lámpara LED Inteligente', 599.00)">Agregar al carrito</button>
+            </div>
+
+            <!-- Ropa -->
+            <div class="card" data-category="ropa">
+                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" alt="Chamarra Deportiva">
+                <h3>Chamarra Deportiva</h3>
+                <p class="descripcion">Impermeable, capucha, varios colores</p>
+                <p class="precio">$1,299.00</p>
+                <button class="btn" onclick="addToCart('Chamarra Deportiva', 1299.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="ropa">
+                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400" alt="Zapatos Deportivos">
+                <h3>Zapatos Deportivos</h3>
+                <p class="descripcion">Running, amortiguación, varios tallas</p>
+                <p class="precio">$1,899.00</p>
+                <button class="btn" onclick="addToCart('Zapatos Deportivos', 1899.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="ropa">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" alt="Vestido Elegante">
+                <h3>Vestido Elegante</h3>
+                <p class="descripcion">Algodón, varios colores y tallas</p>
+                <p class="precio">$899.00</p>
+                <button class="btn" onclick="addToCart('Vestido Elegante', 899.00)">Agregar al carrito</button>
+            </div>
+
+            <!-- Deportes -->
+            <div class="card" data-category="deportes">
+                <img src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=400" alt="Bicicleta">
+                <h3>Bicicleta de Montaña</h3>
+                <p class="descripcion">21 velocidades, suspensión, aluminio</p>
+                <p class="precio">$8,999.00</p>
+                <button class="btn" onclick="addToCart('Bicicleta de Montaña', 8999.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="deportes">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="Pesas">
+                <h3>Kit de Pesas Ajustables</h3>
+                <p class="descripcion">2x20kg, barras incluidas</p>
+                <p class="precio">$2,499.00</p>
+                <button class="btn" onclick="addToCart('Kit de Pesas Ajustables', 2499.00)">Agregar al carrito</button>
+            </div>
+
+            <!-- Belleza -->
+            <div class="card" data-category="belleza">
+                <img src="https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400" alt="Kit Maquillaje">
+                <h3>Kit de Maquillaje Profesional</h3>
+                <p class="descripcion">24 sombras, pinceles, espejo</p>
+                <p class="precio">$1,599.00</p>
+                <button class="btn" onclick="addToCart('Kit de Maquillaje Profesional', 1599.00)">Agregar al carrito</button>
+            </div>
+
+            <div class="card" data-category="belleza">
+                <img src="https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?w=400" alt="Perfume">
+                <h3>Perfume Premium</h3>
+                <p class="descripcion">100ml, fragancia exclusiva</p>
+                <p class="precio">$1,299.00</p>
+                <button class="btn" onclick="addToCart('Perfume Premium', 1299.00)">Agregar al carrito</button>
+            </div>
+
+            <!-- Libros -->
+            <div class="card" data-category="libros">
+                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400" alt="Libro">
+                <h3>Colección de Libros Best Sellers</h3>
+                <p class="descripcion">Pack de 5 libros más vendidos</p>
+                <p class="precio">$899.00</p>
+                <button class="btn" onclick="addToCart('Colección de Libros Best Sellers', 899.00)">Agregar al carrito</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="servicios" class="servicios">
+        <h2>Nuestros Servicios</h2>
+        <p class="section-subtitle">Ofrecemos servicios profesionales de alta calidad</p>
+        
+        <div class="servicios-grid">
+            <div class="servicio-card">
+                <div class="servicio-icon">💻</div>
+                <h3>Desarrollo Web</h3>
+                <p>Creación de sitios web profesionales y aplicaciones web modernas</p>
+                <ul>
+                    <li>Diseño responsive</li>
+                    <li>Optimización SEO</li>
+                    <li>E-commerce</li>
+                </ul>
+                <p class="servicio-precio">Desde $5,000/mes</p>
+                <button class="btn-servicio" onclick="addServiceToCart('Desarrollo Web', 5000)">Contratar Servicio</button>
+            </div>
+
+            <div class="servicio-card">
+                <div class="servicio-icon">📱</div>
+                <h3>Desarrollo de Apps</h3>
+                <p>Aplicaciones móviles para iOS y Android</p>
+                <ul>
+                    <li>Apps nativas</li>
+                    <li>Apps híbridas</li>
+                    <li>Mantenimiento</li>
+                </ul>
+                <p class="servicio-precio">Desde $8,000/proyecto</p>
+                <button class="btn-servicio" onclick="addServiceToCart('Desarrollo de Apps', 8000)">Contratar Servicio</button>
+            </div>
+
+            <div class="servicio-card">
+                <div class="servicio-icon">🎨</div>
+                <h3>Diseño Gráfico</h3>
+                <p>Diseño de logos, branding y material gráfico</p>
+                <ul>
+                    <li>Identidad visual</li>
+                    <li>Diseño de logos</li>
+                    <li>Material publicitario</li>
+                </ul>
+                <p class="servicio-precio">Desde $2,500/proyecto</p>
+                <button class="btn-servicio" onclick="addServiceToCart('Diseño Gráfico', 2500)">Contratar Servicio</button>
+            </div>
+
+            <div class="servicio-card">
+                <div class="servicio-icon">📊</div>
+                <h3>Marketing Digital</h3>
+                <p>Estrategias de marketing online y redes sociales</p>
+                <ul>
+                    <li>SEO y SEM</li>
+                    <li>Redes sociales</li>
+                    <li>Email marketing</li>
+                </ul>
+                <p class="servicio-precio">Desde $3,500/mes</p>
+                <button class="btn-servicio" onclick="addServiceToCart('Marketing Digital', 3500)">Contratar Servicio</button>
+            </div>
+
+            <div class="servicio-card">
+                <div class="servicio-icon">🔧</div>
+                <h3>Soporte Técnico</h3>
+                <p>Mantenimiento y soporte para tu negocio</p>
+                <ul>
+                    <li>Soporte 24/7</li>
+                    <li>Mantenimiento preventivo</li>
+                    <li>Resolución de problemas</li>
+                </ul>
+                <p class="servicio-precio">Desde $1,500/mes</p>
+                <button class="btn-servicio" onclick="addServiceToCart('Soporte Técnico', 1500)">Contratar Servicio</button>
+            </div>
+
+            <div class="servicio-card">
+                <div class="servicio-icon">📸</div>
+                <h3>Fotografía Profesional</h3>
+                <p>Sesiones fotográficas para eventos y productos</p>
+                <ul>
+                    <li>Fotografía de productos</li>
+                    <li>Eventos corporativos</li>
+                    <li>Edición profesional</li>
+                </ul>
+                <p class="servicio-precio">Desde $2,000/sesión</p>
+                <button class="btn-servicio" onclick="addServiceToCart('Fotografía Profesional', 2000)">Contratar Servicio</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section id="testimonios" class="testimonios">
+        <h2>Lo que dicen nuestros clientes</h2>
+        <div class="testimonios-grid">
+            <div class="testimonio-card">
+                <div class="testimonio-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonio-texto">"Excelente servicio y productos de calidad. La entrega fue rápida y el producto superó mis expectativas."</p>
+                <p class="testimonio-autor">- María González</p>
+            </div>
+            <div class="testimonio-card">
+                <div class="testimonio-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonio-texto">"Contraté el servicio de desarrollo web y quedé muy satisfecho. Profesionales y puntuales."</p>
+                <p class="testimonio-autor">- Juan Pérez</p>
+            </div>
+            <div class="testimonio-card">
+                <div class="testimonio-stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonio-texto">"Los mejores precios del mercado y atención al cliente excepcional. Recomendado 100%."</p>
+                <p class="testimonio-autor">- Ana Martínez</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contacto" class="contacto">
+        <h2>Contáctanos</h2>
+        <div class="contacto-grid">
+            <div class="contacto-info">
+                <h3>Información de Contacto</h3>
+                <div class="contacto-item">
+                    <strong>📧 Email:</strong>
+                    <p>espartano.gamer04@gmail.com</p>
+                </div>
+                <div class="contacto-item">
+                    <strong>📞 Teléfono:</strong>
+                    <p>+52 (868) 3022227</p>
+                </div>
+                <div class="contacto-item">
+                    <strong>📍 Dirección:</strong>
+                    <p>UTM, Matamoros, Tamaulipas, México</p>
+                </div>
+                <div class="contacto-item">
+                    <strong>🕒 Horario:</strong>
+                    <p>Lunes - Viernes: 7:00 AM - 2:00 PM<br>Sábados: 10:00 AM - 6:00 PM</p>
+                </div>
+            </div>
+            <div class="contacto-form">
+                <h3>Envíanos un mensaje</h3>
+                <p style="font-size: 14px; color: #666; margin-bottom: 15px; text-align: center;">
+                    Los mensajes se enviarán a: <strong>espartano.gamer04@gmail.com</strong>
+                </p>
+                <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" onsubmit="submitForm(event)">
+                    <input type="hidden" name="access_key" value="81492505-2429-45d1-9c25-12ce72bb0d00" id="access-key-input">
+                    <input type="hidden" name="subject" value="Nuevo mensaje de contacto - Tienda Online">
+                    <input type="hidden" name="from_name" value="Formulario de Contacto">
+                    <input type="hidden" name="to_email" value="espartano.gamer04@gmail.com">
+                    <input type="hidden" name="redirect" value="false">
+                    <input type="checkbox" name="botcheck" style="display: none;">
+                    
+                    <input type="text" id="nombre" name="name" placeholder="Nombre completo" required>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                    <input type="tel" id="telefono" name="phone" placeholder="Teléfono">
+                    <textarea id="mensaje" name="message" placeholder="Mensaje" rows="5" required></textarea>
+                    <button type="submit" class="btn-submit" id="submit-btn">Enviar Mensaje</button>
+                </form>
+                <div id="form-message" style="margin-top: 15px; text-align: center; display: none;"></div>
+                <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px; font-size: 12px;">
+                    <strong>💡 Para recibir emails automáticamente:</strong> Ve a <a href="https://web3forms.com/" target="_blank" style="color: #1a73e8;">web3forms.com</a>, ingresa tu email y copia el Access Key. Luego reemplaza "YOUR_ACCESS_KEY" en el código.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Tienda Online</h3>
+                <p>Tu tienda de confianza para productos y servicios de calidad ofreciendote la mejor experiencia de compra y resultados profesionales.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <a href="#inicio">Inicio</a>
+                <a href="#productos">Productos</a>
+                <a href="#servicios">Servicios</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+            <div class="footer-section">
+                <h3>Síguenos</h3>
+                <div class="social-links">
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Tienda Online - UTM Matamoros. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
