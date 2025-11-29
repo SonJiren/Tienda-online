@@ -53,16 +53,22 @@ function updateCartDisplay() {
     
     // Actualizar items del carrito
     if (cart.length === 0) {
-        cartItems.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Tu carrito está vacío</p>';
+        cartItems.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; color: #999;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🛒</div>
+                <p style="font-size: 18px; color: #666; margin-bottom: 10px; font-weight: 600;">Tu carrito está vacío</p>
+                <p style="font-size: 14px; color: #999;">Agrega productos para comenzar a comprar</p>
+            </div>
+        `;
     } else {
         cartItems.innerHTML = cart.map((item, index) => `
             <div class="cart-item">
                 <div class="cart-item-info">
                     <h4>${item.name}</h4>
-                    <p>Cantidad: ${item.quantity} | Precio: $${item.price.toFixed(2)}</p>
+                    <p>Cantidad: <strong>${item.quantity}</strong> × $${item.price.toFixed(2)}</p>
                     <p><strong>Subtotal: $${(item.price * item.quantity).toFixed(2)}</strong></p>
                 </div>
-                <button class="cart-item-remove" onclick="removeFromCart(${index})">Eliminar</button>
+                <button class="cart-item-remove" onclick="removeFromCart(${index})" title="Eliminar">🗑️</button>
             </div>
         `).join('');
     }
@@ -81,8 +87,15 @@ function removeFromCart(index) {
 // Función para abrir/cerrar carrito
 function toggleCart() {
     const cartSidebar = document.getElementById('cart-sidebar');
+    const cartOverlay = document.getElementById('cart-overlay');
     cartSidebar.classList.toggle('open');
+    if (cartOverlay) {
+        cartOverlay.classList.toggle('active');
+    }
 }
+
+// Variable para almacenar el método de pago seleccionado
+let selectedPaymentMethod = null;
 
 // Función para finalizar compra
 function checkout() {
@@ -91,15 +104,440 @@ function checkout() {
         return;
     }
     
-    const confirmMessage = `¿Deseas finalizar la compra?\n\nTotal: $${total.toFixed(2)}\n\nItems: ${cart.reduce((sum, item) => sum + item.quantity, 0)}`;
+    // Abrir modal de pago
+    openPaymentModal();
+}
+
+// Función para abrir modal de pago
+function openPaymentModal() {
+    const modal = document.getElementById('payment-modal');
+    const paymentTotal = document.getElementById('payment-total');
     
-    if (confirm(confirmMessage)) {
-        alert(`¡Compra realizada con éxito!\n\nTotal pagado: $${total.toFixed(2)}\n\nGracias por tu compra.`);
+    if (modal && paymentTotal) {
+        paymentTotal.textContent = `$${total.toFixed(2)}`;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Resetear selección
+        selectedPaymentMethod = null;
+        document.getElementById('payment-confirm').style.display = 'none';
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+    }
+}
+
+// Función para cerrar modal de pago
+function closePaymentModal() {
+    const modal = document.getElementById('payment-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Función para seleccionar método de pago
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    
+    // Actualizar UI
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+    
+    // Mostrar confirmación
+    const confirmDiv = document.getElementById('payment-confirm');
+    const methodName = document.getElementById('selected-method-name');
+    
+    const methodNames = {
+        'oxxo': 'OXXO',
+        'paypal': 'PayPal',
+        'mercadopago': 'Mercado Pago',
+        'tarjeta': 'Tarjeta de Crédito/Débito'
+    };
+    
+    if (confirmDiv && methodName) {
+        methodName.textContent = methodNames[method] || method;
+        confirmDiv.style.display = 'block';
+    }
+}
+
+// Función para procesar el pago
+function processPayment() {
+    if (!selectedPaymentMethod) {
+        alert('Por favor selecciona un método de pago');
+        return;
+    }
+    
+    // Cerrar modal de pago
+    closePaymentModal();
+    
+    // Si es OXXO, mostrar código de barras
+    if (selectedPaymentMethod === 'oxxo') {
+        generateBarcode();
+    } else {
+        // Para otros métodos, mostrar formulario de pago
+        openPaymentFormModal();
+    }
+}
+
+// Función para generar código de barras
+function generateBarcode() {
+    // Generar código de referencia único
+    const referenceCode = 'REF-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    
+    // Abrir modal de código de barras
+    const modal = document.getElementById('barcode-modal');
+    const barcodeMethod = document.getElementById('barcode-method');
+    const barcodeTotal = document.getElementById('barcode-total');
+    const referenceCodeSpan = document.getElementById('reference-code');
+    
+    const methodNames = {
+        'oxxo': 'OXXO',
+        'paypal': 'PayPal',
+        'mercadopago': 'Mercado Pago',
+        'tarjeta': 'Tarjeta de Crédito/Débito'
+    };
+    
+    if (modal && barcodeMethod && barcodeTotal && referenceCodeSpan) {
+        barcodeMethod.textContent = methodNames[selectedPaymentMethod] || selectedPaymentMethod;
+        barcodeTotal.textContent = `$${total.toFixed(2)}`;
+        referenceCodeSpan.textContent = referenceCode;
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Generar código de barras usando JsBarcode
+        setTimeout(() => {
+            try {
+                const canvas = document.getElementById('barcode-canvas');
+                if (canvas && typeof JsBarcode !== 'undefined') {
+                    JsBarcode(canvas, referenceCode, {
+                        format: "CODE128",
+                        width: 2,
+                        height: 100,
+                        displayValue: true,
+                        fontSize: 20,
+                        margin: 10
+                    });
+                } else {
+                    // Fallback: crear código de barras simple
+                    createSimpleBarcode(referenceCode);
+                }
+            } catch (error) {
+                console.error('Error generando código de barras:', error);
+                createSimpleBarcode(referenceCode);
+            }
+        }, 100);
+    }
+}
+
+// Función para crear código de barras simple (fallback)
+function createSimpleBarcode(code) {
+    const canvas = document.getElementById('barcode-canvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = 400;
+    canvas.height = 150;
+    
+    // Fondo blanco
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Dibujar barras simples
+    ctx.fillStyle = '#000000';
+    let x = 50;
+    for (let i = 0; i < code.length; i++) {
+        const char = code.charCodeAt(i);
+        const barWidth = (char % 3) + 1;
+        const barHeight = 80 + (char % 20);
+        
+        ctx.fillRect(x, 20, barWidth, barHeight);
+        x += barWidth + 1;
+    }
+    
+    // Texto del código
+    ctx.fillStyle = '#000000';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(code, canvas.width / 2, 130);
+}
+
+// Función para descargar código de barras
+function downloadBarcode() {
+    const canvas = document.getElementById('barcode-canvas');
+    if (!canvas) return;
+    
+    try {
+        // Convertir canvas a imagen
+        const link = document.createElement('a');
+        link.download = 'codigo-barras-' + Date.now() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        showNotification('Código de barras descargado');
+    } catch (error) {
+        console.error('Error descargando código de barras:', error);
+        alert('Error al descargar el código de barras');
+    }
+}
+
+// Función para cerrar modal de código de barras
+function closeBarcodeModal() {
+    const modal = document.getElementById('barcode-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Función para abrir modal de formulario de pago
+function openPaymentFormModal() {
+    const modal = document.getElementById('payment-form-modal');
+    const formTitle = document.getElementById('payment-form-title');
+    const formTotal = document.getElementById('form-payment-total');
+    const formMethod = document.getElementById('form-payment-method');
+    
+    const methodNames = {
+        'paypal': 'PayPal',
+        'mercadopago': 'Mercado Pago',
+        'tarjeta': 'Tarjeta de Crédito/Débito'
+    };
+    
+    if (modal && formTitle && formTotal && formMethod) {
+        // Ocultar todos los formularios
+        document.getElementById('paypal-form').style.display = 'none';
+        document.getElementById('card-form').style.display = 'none';
+        document.getElementById('mercadopago-form').style.display = 'none';
+        
+        // Mostrar el formulario correspondiente
+        if (selectedPaymentMethod === 'paypal') {
+            document.getElementById('paypal-form').style.display = 'block';
+            formTitle.textContent = 'Pagar con PayPal';
+        } else if (selectedPaymentMethod === 'tarjeta') {
+            document.getElementById('card-form').style.display = 'block';
+            formTitle.textContent = 'Pagar con Tarjeta';
+        } else if (selectedPaymentMethod === 'mercadopago') {
+            document.getElementById('mercadopago-form').style.display = 'block';
+            formTitle.textContent = 'Pagar con Mercado Pago';
+        }
+        
+        formTotal.textContent = `$${total.toFixed(2)}`;
+        formMethod.textContent = methodNames[selectedPaymentMethod] || selectedPaymentMethod;
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Función para cerrar modal de formulario de pago
+function closePaymentFormModal() {
+    const modal = document.getElementById('payment-form-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Limpiar formularios
+        const forms = ['paypal-form', 'card-form', 'mercadopago-form'];
+        forms.forEach(formId => {
+            const form = document.getElementById(formId);
+            if (form) {
+                form.querySelectorAll('input').forEach(input => input.value = '');
+            }
+        });
+    }
+}
+
+// Función para enviar formulario de pago
+function submitPaymentForm() {
+    let isValid = true;
+    let missingFields = [];
+    
+    // Validar según el método
+    if (selectedPaymentMethod === 'paypal') {
+        const email = document.getElementById('paypal-email').value;
+        const password = document.getElementById('paypal-password').value;
+        const name = document.getElementById('paypal-name').value;
+        const phone = document.getElementById('paypal-phone').value;
+        const zip = document.getElementById('paypal-zip').value;
+        const address = document.getElementById('paypal-address').value;
+        
+        if (!email) missingFields.push('Email');
+        if (!password) missingFields.push('Contraseña');
+        if (!name) missingFields.push('Nombre');
+        if (!phone) missingFields.push('Teléfono');
+        if (!zip) missingFields.push('Código Postal');
+        if (!address) missingFields.push('Dirección');
+        
+        if (missingFields.length > 0) isValid = false;
+    } else if (selectedPaymentMethod === 'tarjeta') {
+        const cardNumber = document.getElementById('card-number').value;
+        const cardExpiry = document.getElementById('card-expiry').value;
+        const cardCvv = document.getElementById('card-cvv').value;
+        const cardName = document.getElementById('card-name').value;
+        const cardAddress = document.getElementById('card-address').value;
+        const cardCity = document.getElementById('card-city').value;
+        const cardZip = document.getElementById('card-zip').value;
+        const cardEmail = document.getElementById('card-email').value;
+        
+        if (!cardNumber) missingFields.push('Número de Tarjeta');
+        if (!cardExpiry) missingFields.push('Fecha de Vencimiento');
+        if (!cardCvv) missingFields.push('CVV');
+        if (!cardName) missingFields.push('Nombre en la Tarjeta');
+        if (!cardAddress) missingFields.push('Dirección');
+        if (!cardCity) missingFields.push('Ciudad');
+        if (!cardZip) missingFields.push('Código Postal');
+        if (!cardEmail) missingFields.push('Email');
+        
+        if (missingFields.length > 0) isValid = false;
+    } else if (selectedPaymentMethod === 'mercadopago') {
+        const email = document.getElementById('mercadopago-email').value;
+        const password = document.getElementById('mercadopago-password').value;
+        const name = document.getElementById('mercadopago-name').value;
+        const phone = document.getElementById('mercadopago-phone').value;
+        const dni = document.getElementById('mercadopago-dni').value;
+        const address = document.getElementById('mercadopago-address').value;
+        const city = document.getElementById('mercadopago-city').value;
+        const zip = document.getElementById('mercadopago-zip').value;
+        
+        if (!email) missingFields.push('Email');
+        if (!password) missingFields.push('Contraseña');
+        if (!name) missingFields.push('Nombre');
+        if (!phone) missingFields.push('Teléfono');
+        if (!dni) missingFields.push('DNI/CPF');
+        if (!address) missingFields.push('Dirección');
+        if (!city) missingFields.push('Ciudad');
+        if (!zip) missingFields.push('Código Postal');
+        
+        if (missingFields.length > 0) isValid = false;
+    }
+    
+    if (!isValid) {
+        alert('Por favor completa todos los campos requeridos:\n\n' + missingFields.join('\n'));
+        return;
+    }
+    
+    // Cerrar modal de formulario
+    closePaymentFormModal();
+    
+    // Mostrar animación de éxito
+    showSuccessAnimation();
+}
+
+// Función para completar el pago (desde código de barras OXXO)
+function completePayment() {
+    if (confirm('¿Confirmas que has completado el pago en OXXO?')) {
+        // Cerrar modal de código de barras
+        closeBarcodeModal();
+        
+        // Mostrar animación de éxito
+        showSuccessAnimation();
+    }
+}
+
+// Función para mostrar animación de éxito
+function showSuccessAnimation() {
+    const animation = document.getElementById('success-animation');
+    const successTotal = document.getElementById('success-total');
+    const successMethod = document.getElementById('success-method');
+    
+    const methodNames = {
+        'oxxo': 'OXXO',
+        'paypal': 'PayPal',
+        'mercadopago': 'Mercado Pago',
+        'tarjeta': 'Tarjeta de Crédito/Débito'
+    };
+    
+    if (animation && successTotal && successMethod) {
+        successTotal.textContent = `$${total.toFixed(2)}`;
+        successMethod.textContent = methodNames[selectedPaymentMethod] || selectedPaymentMethod;
+        
+        animation.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Lanzar confeti
+        launchConfetti();
+        
+        // Limpiar carrito después de 3 segundos
+        setTimeout(() => {
         cart = [];
         updateCartDisplay();
         toggleCart();
+        }, 3000);
     }
 }
+
+// Función para lanzar confeti
+function launchConfetti() {
+    if (typeof confetti !== 'undefined') {
+        // Confeti desde el centro
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+        
+        // Más confeti después de un delay
+        setTimeout(() => {
+            confetti({
+                particleCount: 50,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+            });
+            confetti({
+                particleCount: 50,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+            });
+        }, 250);
+        
+        // Confeti final
+        setTimeout(() => {
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+        }, 500);
+    }
+}
+
+// Función para cerrar animación de éxito
+function closeSuccessAnimation() {
+    const animation = document.getElementById('success-animation');
+    if (animation) {
+        animation.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Formatear número de tarjeta
+document.addEventListener('DOMContentLoaded', function() {
+    const cardNumber = document.getElementById('card-number');
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+    }
+    
+    // Formatear fecha de vencimiento
+    const cardExpiry = document.getElementById('card-expiry');
+    if (cardExpiry) {
+        cardExpiry.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+    }
+});
 
 // Función para filtrar productos por categoría
 function filterProducts(category) {
@@ -221,6 +659,18 @@ function showNotification(message) {
     }, 3000);
 }
 
+// Contador de caracteres para el textarea
+document.addEventListener('DOMContentLoaded', function() {
+    const mensajeTextarea = document.getElementById('mensaje');
+    const charCount = document.getElementById('char-count');
+    
+    if (mensajeTextarea && charCount) {
+        mensajeTextarea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+    }
+});
+
 // Función para enviar formulario de contacto usando Web3Forms
 async function submitForm(event) {
     event.preventDefault();
@@ -246,8 +696,9 @@ async function submitForm(event) {
     
     // Verificar si Web3Forms está configurado
     if (accessKey && accessKey !== 'YOUR_ACCESS_KEY' && accessKey.length > 10) {
-        // Usar Web3Forms API
+        // Usar Web3Forms API - formato por defecto
         try {
+            // Enviar el formulario directamente sin modificar nada
             const formData = new FormData(form);
             
             const response = await fetch('https://api.web3forms.com/submit', {
@@ -426,17 +877,8 @@ function copyEmailInfo() {
     }
 }
 
-// Cerrar carrito al hacer clic fuera
-document.addEventListener('click', function(event) {
-    const cartSidebar = document.getElementById('cart-sidebar');
-    const cartIcon = document.querySelector('.cart-icon');
-    
-    if (cartSidebar.classList.contains('open') && 
-        !cartSidebar.contains(event.target) && 
-        !cartIcon.contains(event.target)) {
-        toggleCart();
-    }
-});
+// Cerrar carrito al hacer clic fuera (ya manejado por el overlay)
+// El overlay ya tiene el onclick="toggleCart()" en el HTML
 
 // Efectos de animación al hacer scroll
 const observerOptions = {

@@ -25,16 +25,20 @@
         </div>
     </header>
 
+    <!-- Overlay para el carrito -->
+    <div id="cart-overlay" class="cart-overlay" onclick="toggleCart()"></div>
+    
     <!-- Carrito de Compras -->
     <div id="cart-sidebar" class="cart-sidebar">
         <div class="cart-header">
             <h2>Carrito de Compras</h2>
-            <button class="close-cart" onclick="toggleCart()">✕</button>
+            <button class="close-cart" onclick="toggleCart()" title="Cerrar">✕</button>
         </div>
         <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
             <div class="cart-total">
-                <strong>Total: $<span id="cart-total">0.00</span></strong>
+                <strong>Total</strong>
+                <span id="cart-total">$0.00</span>
             </div>
             <button class="btn-checkout" onclick="checkout()">Finalizar Compra</button>
         </div>
@@ -379,9 +383,13 @@
             </div>
             <div class="contacto-form">
                 <h3>Envíanos un mensaje</h3>
-                <p style="font-size: 14px; color: #666; margin-bottom: 15px; text-align: center;">
-                    Los mensajes se enviarán a: <strong>espartano.gamer04@gmail.com</strong>
-                </p>
+                <div class="contacto-info-box">
+                    <div class="contacto-info-icon">👔</div>
+                    <div class="contacto-info-content">
+                        <strong>Gerente de Operaciones</strong>
+                        <p>Tu mensaje será revisado por nuestro equipo de atención al cliente</p>
+                    </div>
+                </div>
                 <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" onsubmit="submitForm(event)">
                     <input type="hidden" name="access_key" value="81492505-2429-45d1-9c25-12ce72bb0d00" id="access-key-input">
                     <input type="hidden" name="subject" value="Nuevo mensaje de contacto - Tienda Online">
@@ -390,15 +398,39 @@
                     <input type="hidden" name="redirect" value="false">
                     <input type="checkbox" name="botcheck" style="display: none;">
                     
-                    <input type="text" id="nombre" name="name" placeholder="Nombre completo" required>
-                    <input type="email" id="email" name="email" placeholder="Email" required>
-                    <input type="tel" id="telefono" name="phone" placeholder="Teléfono">
-                    <textarea id="mensaje" name="message" placeholder="Mensaje" rows="5" required></textarea>
-                    <button type="submit" class="btn-submit" id="submit-btn">Enviar Mensaje</button>
+                    <div class="form-group">
+                        <label for="nombre">👤 Nombre completo</label>
+                        <input type="text" id="nombre" name="name" placeholder="Ingresa tu nombre completo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">📧 Email</label>
+                        <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono">📞 Teléfono <span class="optional">(opcional)</span></label>
+                        <input type="tel" id="telefono" name="phone" placeholder="+52 (000) 000-0000">
+                    </div>
+                    
+                    <div class="form-group message-group">
+                        <label for="mensaje">💬 Tu mensaje</label>
+                        <div class="textarea-wrapper">
+                            <textarea id="mensaje" name="message" placeholder="Escribe aquí tu mensaje, consulta o solicitud. Nos pondremos en contacto contigo lo antes posible..." rows="6" required></textarea>
+                            <div class="textarea-footer">
+                                <span class="char-count"><span id="char-count">0</span> caracteres</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" id="submit-btn">
+                        <span class="btn-icon">📤</span>
+                        <span class="btn-text">Enviar Mensaje</span>
+                    </button>
                 </form>
-                <div id="form-message" style="margin-top: 15px; text-align: center; display: none;"></div>
-                <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px; font-size: 12px;">
-                    <strong>💡 Para recibir emails automáticamente:</strong> Ve a <a href="https://web3forms.com/" target="_blank" style="color: #1a73e8;">web3forms.com</a>, ingresa tu email y copia el Access Key. Luego reemplaza "YOUR_ACCESS_KEY" en el código.
+                <div id="form-message" style="margin-top: 20px; text-align: center; display: none;"></div>
+                <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #fff3cd 0%, #ffe082 100%); border-left: 4px solid #ffc107; border-radius: 10px; font-size: 13px; box-shadow: 0 2px 8px rgba(255,193,7,0.2);">
+                    <strong>💡 Para recibir emails automáticamente:</strong> Ve a <a href="https://web3forms.com/" target="_blank" style="color: #1a73e8; font-weight: 600;">web3forms.com</a>, ingresa tu email y copia el Access Key. Luego reemplaza "YOUR_ACCESS_KEY" en el código.
                 </div>
             </div>
         </div>
@@ -431,6 +463,239 @@
         </div>
     </footer>
 
+    <!-- Modal de Pago -->
+    <div id="payment-modal" class="payment-modal">
+        <div class="payment-modal-content">
+            <div class="payment-header">
+                <h2>Selecciona tu método de pago</h2>
+                <button class="close-payment" onclick="closePaymentModal()">✕</button>
+            </div>
+            <div class="payment-body">
+                <div class="payment-options">
+                    <div class="payment-option" onclick="selectPaymentMethod('oxxo')">
+                        <div class="payment-icon">🏪</div>
+                        <h3>OXXO</h3>
+                        <p>Paga en efectivo en cualquier tienda OXXO</p>
+                    </div>
+                    <div class="payment-option" onclick="selectPaymentMethod('paypal')">
+                        <div class="payment-icon">💳</div>
+                        <h3>PayPal</h3>
+                        <p>Paga con tu cuenta PayPal</p>
+                    </div>
+                    <div class="payment-option" onclick="selectPaymentMethod('mercadopago')">
+                        <div class="payment-icon">🛒</div>
+                        <h3>Mercado Pago</h3>
+                        <p>Paga con Mercado Pago</p>
+                    </div>
+                    <div class="payment-option" onclick="selectPaymentMethod('tarjeta')">
+                        <div class="payment-icon">💳</div>
+                        <h3>Tarjeta de Crédito/Débito</h3>
+                        <p>Paga con tarjeta bancaria</p>
+                    </div>
+                </div>
+                <div id="payment-confirm" class="payment-confirm" style="display: none;">
+                    <div class="selected-method">
+                        <h3>Método seleccionado: <span id="selected-method-name"></span></h3>
+                        <p>Total a pagar: <strong id="payment-total">$0.00</strong></p>
+                    </div>
+                    <button class="btn-continue-payment" onclick="processPayment()">Continuar con el pago</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Código de Barras (solo para OXXO) -->
+    <div id="barcode-modal" class="barcode-modal">
+        <div class="barcode-modal-content">
+            <div class="barcode-header">
+                <h2>Tu código de pago OXXO</h2>
+                <button class="close-barcode" onclick="closeBarcodeModal()">✕</button>
+            </div>
+            <div class="barcode-body">
+                <div class="barcode-info">
+                    <p><strong>Método:</strong> <span id="barcode-method"></span></p>
+                    <p><strong>Total:</strong> <span id="barcode-total"></span></p>
+                    <p><strong>Código de referencia:</strong> <span id="reference-code"></span></p>
+                </div>
+                <div class="barcode-container">
+                    <canvas id="barcode-canvas"></canvas>
+                </div>
+                <div class="barcode-actions">
+                    <button class="btn-download-barcode" onclick="downloadBarcode()">📥 Descargar Código de Barras</button>
+                    <button class="btn-complete-payment" onclick="completePayment()">✅ Completar Pago</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Formulario de Pago (PayPal, Tarjeta, Mercado Pago) -->
+    <div id="payment-form-modal" class="payment-form-modal">
+        <div class="payment-form-modal-content">
+            <div class="payment-form-header">
+                <h2 id="payment-form-title">Completar Pago</h2>
+                <button class="close-payment-form" onclick="closePaymentFormModal()">✕</button>
+            </div>
+            <div class="payment-form-body">
+                <div class="payment-summary">
+                    <p><strong>Total a pagar:</strong> <span id="form-payment-total">$0.00</span></p>
+                    <p><strong>Método:</strong> <span id="form-payment-method"></span></p>
+                </div>
+                
+                <!-- Formulario PayPal -->
+                <div id="paypal-form" class="payment-form-content" style="display: none;">
+                    <div class="form-section">
+                        <h3 class="form-section-title">📧 Información de Cuenta</h3>
+                        <div class="form-group">
+                            <label><span class="label-icon">✉️</span> Email de PayPal</label>
+                            <input type="email" id="paypal-email" placeholder="ejemplo@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">🔒</span> Contraseña</label>
+                            <input type="password" id="paypal-password" placeholder="Ingresa tu contraseña" required>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3 class="form-section-title">👤 Información Personal</h3>
+                        <div class="form-group">
+                            <label><span class="label-icon">👤</span> Nombre Completo</label>
+                            <input type="text" id="paypal-name" placeholder="Nombre y apellidos" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><span class="label-icon">📞</span> Teléfono</label>
+                                <input type="tel" id="paypal-phone" placeholder="+52 (000) 000-0000" required>
+                            </div>
+                            <div class="form-group">
+                                <label><span class="label-icon">📍</span> Código Postal</label>
+                                <input type="text" id="paypal-zip" placeholder="00000" maxlength="5" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">🏠</span> Dirección</label>
+                            <input type="text" id="paypal-address" placeholder="Calle, número, colonia" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulario Tarjeta -->
+                <div id="card-form" class="payment-form-content" style="display: none;">
+                    <div class="form-section card-section-highlight">
+                        <h3 class="form-section-title">💳 Información de la Tarjeta</h3>
+                        <div class="form-group card-number-group">
+                            <label><span class="label-icon">💳</span> Número de Tarjeta <span class="required-star">*</span></label>
+                            <div class="input-with-icon card-input-wrapper">
+                                <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required autocomplete="cc-number">
+                                <span class="card-icon">💳</span>
+                            </div>
+                            <small class="input-hint">Ingresa los 16 dígitos de tu tarjeta</small>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">👤</span> Nombre en la Tarjeta</label>
+                            <input type="text" id="card-name" placeholder="NOMBRE COMPLETO COMO APARECE EN LA TARJETA" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><span class="label-icon">📅</span> Fecha de Vencimiento</label>
+                                <input type="text" id="card-expiry" placeholder="MM/AA" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label><span class="label-icon">🔐</span> CVV</label>
+                                <input type="text" id="card-cvv" placeholder="123" maxlength="4" required>
+                                <small class="input-hint">3 o 4 dígitos en el reverso</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3 class="form-section-title">📍 Información de Facturación</h3>
+                        <div class="form-group">
+                            <label><span class="label-icon">🏠</span> Dirección</label>
+                            <input type="text" id="card-address" placeholder="Calle, número, colonia" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><span class="label-icon">🏙️</span> Ciudad</label>
+                                <input type="text" id="card-city" placeholder="Ciudad" required>
+                            </div>
+                            <div class="form-group">
+                                <label><span class="label-icon">📍</span> Código Postal</label>
+                                <input type="text" id="card-zip" placeholder="00000" maxlength="5" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">📧</span> Email para Recibo</label>
+                            <input type="email" id="card-email" placeholder="email@ejemplo.com" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulario Mercado Pago -->
+                <div id="mercadopago-form" class="payment-form-content" style="display: none;">
+                    <div class="form-section">
+                        <h3 class="form-section-title">📧 Información de Cuenta</h3>
+                        <div class="form-group">
+                            <label><span class="label-icon">✉️</span> Email de Mercado Pago</label>
+                            <input type="email" id="mercadopago-email" placeholder="ejemplo@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">🔒</span> Contraseña</label>
+                            <input type="password" id="mercadopago-password" placeholder="Ingresa tu contraseña" required>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3 class="form-section-title">👤 Información Personal</h3>
+                        <div class="form-group">
+                            <label><span class="label-icon">👤</span> Nombre Completo</label>
+                            <input type="text" id="mercadopago-name" placeholder="Nombre y apellidos" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><span class="label-icon">📞</span> Teléfono</label>
+                                <input type="tel" id="mercadopago-phone" placeholder="+52 (000) 000-0000" required>
+                            </div>
+                            <div class="form-group">
+                                <label><span class="label-icon">🆔</span> DNI/CPF</label>
+                                <input type="text" id="mercadopago-dni" placeholder="Número de identificación" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">🏠</span> Dirección</label>
+                            <input type="text" id="mercadopago-address" placeholder="Calle, número, colonia" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><span class="label-icon">🏙️</span> Ciudad</label>
+                                <input type="text" id="mercadopago-city" placeholder="Ciudad" required>
+                            </div>
+                            <div class="form-group">
+                                <label><span class="label-icon">📍</span> Código Postal</label>
+                                <input type="text" id="mercadopago-zip" placeholder="00000" maxlength="5" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-submit-payment" onclick="submitPaymentForm()">💳 Pagar Ahora</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animación de Éxito -->
+    <div id="success-animation" class="success-animation" style="display: none;">
+        <div class="success-content">
+            <div class="success-icon">✅</div>
+            <h2>¡Pago Realizado con Éxito!</h2>
+            <p>Gracias por tu compra</p>
+            <div class="success-details">
+                <p><strong>Total pagado:</strong> <span id="success-total">$0.00</span></p>
+                <p><strong>Método:</strong> <span id="success-method"></span></p>
+            </div>
+            <button class="btn-close-success" onclick="closeSuccessAnimation()">Cerrar</button>
+        </div>
+        <canvas id="confetti-canvas"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
